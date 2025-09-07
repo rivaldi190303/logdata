@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Login Form</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        
+        .thank-you-message {
+            text-align: center;
+            padding: 40px 0;
+            animation: fadeInGlow 1.5s ease-in-out; 
+        }
+
+        .thank-you-message h2 {
+            margin: 0;
+            padding: 0;
+            font-size: 2.5em; 
+            color: #fff;
+            
+            text-shadow: 0 0 10px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4;
+        }
+
+        /* Keyframes untuk animasi */
+        @keyframes fadeInGlow {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box" id="loginBox">
+        <h2>LOGIN</h2>
+        <form id="loginForm">
+            <div class="user-box">
+                <input type="text" id="nama" name="nama" required="">
+                <label>Nama</label>
+            </div>
+            <div class="user-box">
+                <input type="text" id="nim" name="nim" required="">
+                <label>NIM</label>
+            </div>
+            <button type="submit" class="submit-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Submit
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const loginBox = document.getElementById('loginBox'); // Menangkap elemen kontainer
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const nama = document.getElementById('nama').value;
+            const nim = document.getElementById('nim').value;
+
+            const newUser = {
+                nama: nama,
+                nim: nim
+            };
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            loginBox.innerHTML = `
+                <div class="thank-you-message">
+                    <h2>Terima Kasih!</h2>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
