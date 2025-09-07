@@ -4,90 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data User</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Orbitron', sans-serif;
-            background-color: #000;
-            color: #03e9f4;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #03e9f4;
-            box-shadow: 0 0 15px #03e9f4;
-        }
-        h1 {
-            text-align: center;
-            text-shadow: 0 0 10px #03e9f4;
-        }
-        .user-entry {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-left: 3px solid #03e9f4;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        p {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #fff;
-        }
-        strong {
-            color: #03e9f4;
-            display: inline-block;
-            width: 60px;
-        }
-        hr {
-            border: 0;
-            height: 1px;
-            background-image: linear-gradient(to right, rgba(3, 233, 244, 0), rgba(3, 233, 244, 0.75), rgba(3, 233, 244, 0));
-        }
-        .no-data {
-            text-align: center;
-            font-size: 18px;
-            color: #fff;
-        }
+        /* CSS Anda tidak perlu diubah, jadi saya singkat di sini */
+        body { font-family: 'Orbitron', sans-serif; background-color: #000; color: #03e9f4; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 8px; border: 1px solid #03e9f4; box-shadow: 0 0 15px #03e9f4; }
+        h1 { text-align: center; text-shadow: 0 0 10px #03e9f4; }
+        .user-entry { margin-bottom: 20px; padding: 15px; border-left: 3px solid #03e9f4; }
+        h2 { margin-top: 0; }
+        p { font-size: 16px; line-height: 1.6; color: #fff; }
+        strong { color: #03e9f4; display: inline-block; width: 60px; }
+        hr { border: 0; height: 1px; background-image: linear-gradient(to right, rgba(3, 233, 244, 0), rgba(3, 233, 244, 0.75), rgba(3, 233, 244, 0)); }
+        .no-data { text-align: center; font-size: 18px; color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>Data Pengguna yang Masuk</h1>
-        <div id="data-container"></div>
+        <div id="data-container">
+            <p class="no-data">Memuat data...</p>
+        </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+
+    <script>
+        // PASTE KODE KONFIGURASI FIREBASE ANDA DI SINI
+        const firebaseConfig = {
+          apiKey: "...",
+          authDomain: "...",
+          projectId: "...",
+          storageBucket: "...",
+          messagingSenderId: "...",
+          appId: "..."
+        };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); // Inisialisasi Firestore
+    </script>
+    
     <script>
         // Fungsi ini akan berjalan saat halaman selesai dimuat
         window.onload = function() {
             const dataContainer = document.getElementById('data-container');
             
-            // Mengambil data 'users' dari localStorage
-            const users = JSON.parse(localStorage.getItem('users'));
+            // Mengambil data dari koleksi 'users' di Firestore
+            db.collection("users").get().then((querySnapshot) => {
+                // Periksa apakah ada data
+                if (querySnapshot.empty) {
+                    dataContainer.innerHTML = '<p class="no-data">Belum ada data yang dimasukkan.</p>';
+                    return; // Hentikan fungsi jika tidak ada data
+                }
 
-            // Memeriksa apakah ada data tersimpan
-            if (users && users.length > 0) {
-                // Jika ada, kita buat HTML untuk setiap user
                 let content = '';
-                users.forEach((user, index) => {
+                let index = 1;
+                querySnapshot.forEach((doc) => {
+                    // doc.data() adalah objek yang berisi data (nama dan nim)
+                    const user = doc.data(); 
                     content += `
                         <div class="user-entry">
-                            <h2>User ke-${index + 1}</h2>
+                            <h2>User ke-${index}</h2>
                             <p><strong>Nama:</strong> ${user.nama}</p>
                             <p><strong>NIM:</strong> ${user.nim}</p>
                         </div>
                         <hr>
                     `;
+                    index++;
                 });
+
+                // Tampilkan semua data ke dalam container
                 dataContainer.innerHTML = content;
-            } else {
-                // Jika tidak ada data, tampilkan pesan
-                dataContainer.innerHTML = '<p class="no-data">Belum ada data yang dimasukkan.</p>';
-            }
+
+            }).catch((error) => {
+                console.error("Error saat mengambil data: ", error);
+                dataContainer.innerHTML = '<p class="no-data">Gagal memuat data. Cek konsol.</p>';
+            });
         };
     </script>
 
